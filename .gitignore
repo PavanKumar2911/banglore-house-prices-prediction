@@ -1,0 +1,11 @@
+# Ignore Python artifacts
+__pycache__/
+*.pyc
+*.log
+.ipynb_checkpoints/
+
+# Ignore system, user, and other project folders
+# This is CRITICAL to prevent the past errors by ignoring any path that goes outside the BHP folder
+../
+../../
+../../../

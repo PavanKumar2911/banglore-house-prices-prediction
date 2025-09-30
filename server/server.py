@@ -2,10 +2,8 @@ from flask import Flask, request, jsonify
 from . import util
 import os
 from flask import send_from_directory
-# New line to get the path to the project root
-client_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Client'))
-# Use the absolute path for Flask
-app = Flask(__name__, static_folder=client_path, static_url_path='/')
+from flask import Flask, request, jsonify, render_template, url_for
+app = Flask(__name__, static_folder='../Client')
 
 @app.route('/get_location_names', methods=['GET'])
 def get_location_names():
@@ -39,6 +37,10 @@ def predict_home_price():
 #         return send_from_directory('Client', path)
 #     else:
 #         return send_from_directory('Client', 'app.html')
+
+@app.route('/')
+def index():
+    return app.send_static_file('app.html')
 
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")

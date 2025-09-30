@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from . import util
 import os
 from flask import send_from_directory
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../Client', static_url_path='/')
 
 @app.route('/get_location_names', methods=['GET'])
 def get_location_names():
@@ -27,15 +27,15 @@ def predict_home_price():
 
     return response
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def send_client_files(path):
-    # This function checks if a file exists in the Client folder (like app.css or app.js)
-    # If it doesn't find a specific file, it serves the main app.html file.
-    if path != "" and os.path.exists("Client/" + path):
-        return send_from_directory('Client', path)
-    else:
-        return send_from_directory('Client', 'app.html')
+# @app.route('/', defaults={'path': ''})
+# @app.route('/<path:path>')
+# def send_client_files(path):
+#     # This function checks if a file exists in the Client folder (like app.css or app.js)
+#     # If it doesn't find a specific file, it serves the main app.html file.
+#     if path != "" and os.path.exists("Client/" + path):
+#         return send_from_directory('Client', path)
+#     else:
+#         return send_from_directory('Client', 'app.html')
 
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")

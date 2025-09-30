@@ -2,7 +2,10 @@ from flask import Flask, request, jsonify
 from . import util
 import os
 from flask import send_from_directory
-app = Flask(__name__, static_folder='../Client', static_url_path='/')
+# New line to get the path to the project root
+client_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Client'))
+# Use the absolute path for Flask
+app = Flask(__name__, static_folder=client_path, static_url_path='/')
 
 @app.route('/get_location_names', methods=['GET'])
 def get_location_names():

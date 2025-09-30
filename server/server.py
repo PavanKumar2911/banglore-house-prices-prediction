@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import util
+from . import util
 import os
 from flask import send_from_directory
 app = Flask(__name__)

@@ -1,14 +1,22 @@
 import pickle
 import json
 import numpy as np
+import os
 
 __locations = None
 __data_columns = None
 __model = None
 
+# Get the absolute path to the directory containing util.py (which is the 'server' folder)
+__file_path = os.path.dirname(os.path.abspath(__file__))
+# Define the path to the artifacts folder: IT IS DIRECTLY INSIDE the 'server' folder.
+__artifacts_path = os.path.join(__file_path, 'artifacts')
+
+
 def get_estimated_price(location,sqft,bhk,bath):
     try:
-        loc_index = __data_columns.index(location.lower())
+        # Note: Added .strip() for robust location matching
+        loc_index = __data_columns.index(location.lower().strip())
     except:
         loc_index = -1
 
@@ -24,16 +32,20 @@ def get_estimated_price(location,sqft,bhk,bath):
 
 def load_saved_artifacts():
     print("loading saved artifacts...start")
-    global  __data_columns
+    global __data_columns
     global __locations
 
-    with open("artifacts/columns.json", "r") as f:
+    # FIX 1: JSON Path
+    json_path = os.path.join(__artifacts_path, "columns.json")
+    with open(json_path, "r") as f:
         __data_columns = json.load(f)['data_columns']
         __locations = __data_columns[3:]  # first 3 columns are sqft, bath, bhk
 
     global __model
     if __model is None:
-        with open('artifacts/banglore_home_prices_model.pickle', 'rb') as f:
+        # FIX 2: PICKLE Path
+        model_path = os.path.join(__artifacts_path, 'banglore_home_prices_model.pickle')
+        with open(model_path, 'rb') as f:
             __model = pickle.load(f)
     print("loading saved artifacts...done")
 

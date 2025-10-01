@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify
 from . import util
 import os
 from flask import send_from_directory
-from flask import Flask, request, jsonify, render_template, url_for
-app = Flask(__name__, static_folder='../Client')
+from flask import Flask, request, jsonify, render_template, redirect, url_for
+app = Flask(__name__, static_folder='../Client', static_url_path='/client_static')
 
 @app.route('/get_location_names', methods=['GET'])
 def get_location_names():
@@ -40,7 +40,8 @@ def predict_home_price():
 
 @app.route('/')
 def index():
-    return app.send_static_file('app.html')
+    # Redirect the root URL to the main HTML file via the static path
+    return redirect(url_for('static', filename='app.html'))
 
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")

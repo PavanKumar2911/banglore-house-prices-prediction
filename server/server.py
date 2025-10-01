@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify, redirect, url_for
 from . import util
 
+# CRITICAL FIX: Load artifacts immediately when server.py is imported
+# Gunicorn will execute this line before starting workers.
+util.load_saved_artifacts()
+
 # Cleaned up app initialization: using a single, comprehensive import line
-# The static_url_path needs to be correctly defined for url_for to work reliably
 app = Flask(__name__, static_folder='../Client', static_url_path='/client_static')
 
 
@@ -40,14 +43,12 @@ def predict_home_price():
 @app.route('/')
 def index():
     # Redirect the root URL (/) to the main HTML file via the static path (/client_static/app.html).
-    # We explicitly define the static_url_path for maximum reliability.
     return redirect(url_for('static', filename='app.html', _external=True, _scheme='https'))
 
 
-# Local Run (Not used by Render/Gunicorn)
+# Local Run (The load call is no longer needed here, but kept for local testing)
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")
-    # Load the ML artifacts before starting the server
-    util.load_saved_artifacts()
-    # Ensure debug=True is off in production, but okay for local test
+    # This call is redundant now but harmless for local debugging
+    # util.load_saved_artifacts()
     app.run(debug=True, host='0.0.0.0', port=5000)

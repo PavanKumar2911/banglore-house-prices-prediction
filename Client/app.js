@@ -21,26 +21,17 @@ function onPageLoad() {
             }
         }
     });
-
-    // NOTE: The UI initialization below is for a different type of UI (buttons with classes).
-    // Since the HTML uses standard radio buttons, these lines are not needed and should be commented out or removed.
-    // var bhk = document.getElementById("uiBHK");
-    // bhk.querySelector('button[data-bhk="2"]').click();
-
-    // var bath = document.getElementById("uiBath");
-    // bath.querySelector('button[data-bath="2"]').click();
-
 }
 
 // Helper function for the Estimate Price button
 function onClickedEstimatePrice() {
     var sqft = document.getElementById("uiSqft").value;
-    var bhk = getBHKValue(); // Correctly finds the checked radio value
-    var bath = getBathValue(); // Correctly finds the checked radio value
+    var bhk = getBHKValue(); 
+    var bath = getBathValue(); 
     var location = document.getElementById("uiLocations").value;
     var estPrice = document.getElementById("uiEstimatedPrice");
 
-    //  Replacing the URL below with your actual Render service URL.
+    // CRITICAL: Replace the URL below with your actual Render service URL.
     var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; 
     var url = BASE_API_URL + "/predict_home_price"; 
 
@@ -57,35 +48,33 @@ function onClickedEstimatePrice() {
         location: location
     };
     
+    
     $.ajax({
         url: url,
         type: 'POST',
-        contentType: 'application/json', // This fixes the 415 error
-        data: JSON.stringify(dataPayload), // Convert the JavaScript object to a JSON string
+        contentType: 'application/json', 
+        data: JSON.stringify(dataPayload), 
         dataType: 'json',
         success: function(data, status) {
-            // Successful response from the server (if estimated_price is present)
+            
             if (data.estimated_price) {
-                estPrice.innerHTML = "<h2>Estimated Price: " + data.estimated_price.toString() + " Lakh</h2>";
+                var price = parseFloat(data.estimated_price).toFixed(2);
+                estPrice.innerHTML = "<h2>" + price.toString() + " Lakh</h2>";
             } else {
-                // Handle case where server returns success but no price (e.g., error message)
                  estPrice.innerHTML = "<h2>Calculation Error. Please check input values.</h2>";
             }
             console.log("Price estimation successful.", status);
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            // This runs if the network call or server returns a 4xx/5xx error
             console.error("Price estimation network failure:", textStatus, errorThrown, jqXHR.responseText);
             
-            var errorDetail = "Server did not respond correctly.";
+            var errorDetail = "Server did not respond correctly. Check network or server status.";
             try {
-                // Try to parse the response text to find a more useful server error message
                 var responseJson = JSON.parse(jqXHR.responseText);
                 errorDetail = responseJson.error || errorDetail;
             } catch (e) {
-                // If parsing fails, use the generic error detail
                 if (jqXHR.status === 415) {
-                    errorDetail = "Error 415: Server rejected the data format. The client fix should resolve this.";
+                    errorDetail = "Error 415: Server rejected the data format.";
                 }
             }
             estPrice.innerHTML = "<h2>Error: " + errorDetail + "</h2>";
@@ -95,27 +84,22 @@ function onClickedEstimatePrice() {
 
 
 /**
- * FIXED: Finds the value of the currently checked BHK radio button.
- * The input elements have name="uiBHK".
+ * Finds the value of the currently checked BHK radio button.
  * @returns {number} The selected BHK count.
  */
 function getBHKValue() {
-    // Selects the radio input with name='uiBHK' that is currently checked, and returns its value.
     var bhkValue = $('input[name="uiBHK"]:checked').val();
-    return bhkValue ? parseInt(bhkValue) : 1; // Default to 1 if nothing is selected
+    return bhkValue ? parseInt(bhkValue) : 1; 
 }
 
 /**
- * FIXED: Finds the value of the currently checked Bath radio button.
- * The input elements have name="uiBathrooms".
+ * Finds the value of the currently checked Bath radio button.
  * @returns {number} The selected Bath count.
  */
 function getBathValue() {
-    // Selects the radio input with name='uiBathrooms' that is currently checked, and returns its value.
     var bathValue = $('input[name="uiBathrooms"]:checked').val();
-    return bathValue ? parseInt(bathValue) : 1; // Default to 1 if nothing is selected
+    return bathValue ? parseInt(bathValue) : 1; 
 }
 
 // Attach event listeners after the DOM is fully loaded
-// Changed from window.onload to jQuery's document ready for robustness
 $(document).ready(onPageLoad);

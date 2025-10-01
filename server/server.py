@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, redirect, url_for
-import util
+from . import util
 
 # Cleaned up app initialization: using a single, comprehensive import line
 # The static_url_path needs to be correctly defined for url_for to work reliably

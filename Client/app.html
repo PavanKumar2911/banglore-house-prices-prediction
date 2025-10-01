@@ -11,10 +11,8 @@
 
 <div class="img"></div>
 
-<!-- Container to center the content vertically and horizontally -->
 <div class="form-container">
     
-    <!-- Form Card 1: Area and BHK -->
     <form class="form">
         <h2>Area (Square Feet)</h2>
         <input class="area" type="text" id="uiSqft" class="floatLabel" name="Squareft" value="1000" placeholder="e.g. 1000">
@@ -32,10 +30,7 @@
             <input type="radio" id="radio-bhk-5" name="uiBHK" value="5"/>
             <label for="radio-bhk-5">5</label>
         </div>
-    </form>
 
-    <!-- Form Card 2: Bath, Location, and Submit -->
-    <form class="form">
         <h2>Bathrooms</h2>
         <div class="switch-field">
             <input type="radio" id="radio-bath-1" name="uiBathrooms" value="1"/>
@@ -59,7 +54,6 @@
 
         <button class="submit" onclick="onClickedEstimatePrice()" type="button">Estimate Price</button>
         
-        <!-- The Result Box (uiEstimatedPrice) - Yellow region -->
         <div id="uiEstimatedPrice" class="result"> 
             <h2>Enter details and click 'Estimate Price'</h2> 
         </div>

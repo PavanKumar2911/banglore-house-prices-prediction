@@ -1,64 +1,82 @@
+function onPageLoad() {
+    console.log( "document loaded" );
+    // CRITICAL: Replace the URL below with your actual Render service URL.
+    // Use the variable name BASE_API_URL so it's easy to read.
+    var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; // <-- CONFIRMED RENDER URL
+
+    var url = BASE_API_URL + "/get_location_names"; // Correctly construct the API call URL
+
+    $.get(url, function(data, status) {
+        console.log("got response for get_location_names");
+        if(data) {
+            var locations = data.locations;
+            var uiLocations = document.getElementById("uiLocations");
+            $('#uiLocations').empty(); // Clear any existing options
+            for(var i in locations) {
+                var opt = new Option(locations[i]);
+                $('#uiLocations').append(opt);
+            }
+        }
+    });
+
+    // Initialize BHK and Bath buttons to be selected
+    var bhk = document.getElementById("uiBHK");
+    bhk.querySelector('button[data-bhk="2"]').click();
+
+    var bath = document.getElementById("uiBath");
+    bath.querySelector('button[data-bath="2"]').click();
+
+}
+
+// Helper function for the Estimate Price button
+function onClickedEstimatePrice() {
+    var sqft = document.getElementById("uiSqft").value;
+    var bhk = getBHKValue();
+    var bath = getBathValue();
+    var location = document.getElementById("uiLocations").value;
+    var estPrice = document.getElementById("uiEstimatedPrice");
+
+    // CRITICAL: Replace the URL below with your actual Render service URL.
+    var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; // <-- CONFIRMED RENDER URL
+    var url = BASE_API_URL + "/predict_home_price"; // Correctly construct the API call URL
+
+    $.post(url, {
+        total_sqft: parseFloat(sqft),
+        bhk: bhk,
+        bath: bath,
+        location: location
+    },function(data, status) {
+        estPrice.innerHTML = "<h2>" + data.estimated_price.toString() + " Lakh</h2>";
+        console.log(status);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        // Add failure logging to see why price calculation might fail
+        console.error("Price estimation failed:", textStatus, errorThrown, jqXHR.responseText);
+        estPrice.innerHTML = "<h2>Error calculating price. Check server logs.</h2>";
+    });
+}
+
+
+// --- Rest of your app.js (getBHKValue, getBathValue) should remain the same ---
+
 function getBathValue() {
-  var uiBathrooms = document.getElementsByName("uiBathrooms");
-  for(var i in uiBathrooms) {
-    if(uiBathrooms[i].checked) {
-        return parseInt(i)+1;
+    var uiBath = document.getElementsByName("uiBath");
+    for(var i in uiBath) {
+        if(uiBath[i].classList.contains("selected")) {
+            return parseInt(i)+1;
+        }
     }
-  }
-  return -1; // Invalid Value
+    return -1 // Default to 1 (if nothing is selected)
 }
 
 function getBHKValue() {
-  var uiBHK = document.getElementsByName("uiBHK");
-  for(var i in uiBHK) {
-    if(uiBHK[i].checked) {
-        return parseInt(i)+1;
+    var uiBHK = document.getElementsByName("uiBHK");
+    for(var i in uiBHK) {
+        if(uiBHK[i].classList.contains("selected")) {
+            return parseInt(i)+1;
+        }
     }
-  }
-  return -1; // Invalid Value
+    return -1 // Default to 1 (if nothing is selected)
 }
 
-function onClickedEstimatePrice() {
-  console.log("Estimate price button clicked");
-  var sqft = document.getElementById("uiSqft");
-  var bhk = getBHKValue();
-  var bathrooms = getBathValue();
-  var location = document.getElementById("uiLocations");
-  var estPrice = document.getElementById("uiEstimatedPrice");
-
-//   var url = "http://127.0.0.1:5000/predict_home_price"; //Use this if you are NOT using nginx which is first 7 tutorials
-//   var url = "/api/predict_home_price"; // Use this if  you are using nginx. i.e tutorial 8 and onwards
-   var url = "https://banglore-house-prices-prediction.onrender.com/predict_home_price"; // this is for render
-
-  $.post(url, {
-      total_sqft: parseFloat(sqft.value),
-      bhk: bhk,
-      bath: bathrooms,
-      location: location.value
-  },function(data, status) {
-      console.log(data.estimated_price);
-      estPrice.innerHTML = "<h2>" + data.estimated_price.toString() + " Lakh</h2>";
-      console.log(status);
-  });
-}
-
-function onPageLoad() {
-  console.log( "document loaded" );
-//   var url = "http://127.0.0.1:5000/get_location_names"; // Use this if you are NOT using nginx which is first 7 tutorials
-//   var url = "/api/get_location_names"; // Use this if  you are using nginx. i.e tutorial 8 and onwards
-   var url = "https://banglore-house-prices-prediction.onrender.com/get_location_names"; // this is for render
-  $.get(url,function(data, status) {
-      console.log("got response for get_location_names request");
-      if(data) {
-          var locations = data.locations;
-          var uiLocations = document.getElementById("uiLocations");
-          $('#uiLocations').empty();
-          for(var i in locations) {
-              var opt = new Option(locations[i]);
-              $('#uiLocations').append(opt);
-          }
-      }
-  });
-}
-
+// Attach event listeners after the DOM is fully loaded
 window.onload = onPageLoad;

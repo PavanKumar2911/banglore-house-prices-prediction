@@ -2,7 +2,7 @@ function onPageLoad() {
     console.log( "document loaded" );
     // CRITICAL: Replace the URL below with your actual Render service URL.
     // Use the variable name BASE_API_URL so it's easy to read.
-    var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; // <-- CONFIRMED RENDER URL
+    var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; // CONFIRMED RENDER URL
 
     var url = BASE_API_URL + "/get_location_names"; // Correctly construct the API call URL
 
@@ -37,7 +37,7 @@ function onClickedEstimatePrice() {
     var estPrice = document.getElementById("uiEstimatedPrice");
 
     // CRITICAL: Replace the URL below with your actual Render service URL.
-    var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; // <-- CONFIRMED RENDER URL
+    var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; // CONFIRMED RENDER URL
     var url = BASE_API_URL + "/predict_home_price"; // Correctly construct the API call URL
 
     $.post(url, {
@@ -55,8 +55,6 @@ function onClickedEstimatePrice() {
     });
 }
 
-
-// --- Rest of your app.js (getBHKValue, getBathValue) should remain the same ---
 
 function getBathValue() {
     var uiBath = document.getElementsByName("uiBath");
@@ -79,4 +77,5 @@ function getBHKValue() {
 }
 
 // Attach event listeners after the DOM is fully loaded
-window.onload = onPageLoad;
+// Changed from window.onload to jQuery's document ready for robustness
+$(document).ready(onPageLoad);

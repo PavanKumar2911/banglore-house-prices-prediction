@@ -35,12 +35,12 @@ function onPageLoad() {
 // Helper function for the Estimate Price button
 function onClickedEstimatePrice() {
     var sqft = document.getElementById("uiSqft").value;
-    var bhk = getBHKValue(); // Now correctly finds the checked radio value
-    var bath = getBathValue(); // Now correctly finds the checked radio value
+    var bhk = getBHKValue(); // Correctly finds the checked radio value
+    var bath = getBathValue(); // Correctly finds the checked radio value
     var location = document.getElementById("uiLocations").value;
     var estPrice = document.getElementById("uiEstimatedPrice");
 
-    // CRITICAL: Replace the URL below with your actual Render service URL.
+    //  Replacing the URL below with your actual Render service URL.
     var BASE_API_URL = "https://banglore-house-prices-prediction.onrender.com"; 
     var url = BASE_API_URL + "/predict_home_price"; 
 
@@ -48,33 +48,51 @@ function onClickedEstimatePrice() {
         estPrice.innerHTML = "<h2>Please select a location.</h2>";
         return;
     }
-    
-    // Use $.post to send data to the robust server endpoint
-    $.post(url, {
+
+    // Data payload to be sent as JSON
+    var dataPayload = {
         total_sqft: parseFloat(sqft),
         bhk: bhk,
         bath: bath,
         location: location
-    },function(data, status) {
-        // Successful response from the server (if estimated_price is present)
-        if (data.estimated_price) {
-            estPrice.innerHTML = "<h2>Estimated Price: " + data.estimated_price.toString() + " Lakh</h2>";
-        } else {
-            // Handle case where server returns success but no price (e.g., error message)
-             estPrice.innerHTML = "<h2>Calculation Error. Please check input values.</h2>";
+    };
+    
+    $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: 'application/json', // This fixes the 415 error
+        data: JSON.stringify(dataPayload), // Convert the JavaScript object to a JSON string
+        dataType: 'json',
+        success: function(data, status) {
+            // Successful response from the server (if estimated_price is present)
+            if (data.estimated_price) {
+                estPrice.innerHTML = "<h2>Estimated Price: " + data.estimated_price.toString() + " Lakh</h2>";
+            } else {
+                // Handle case where server returns success but no price (e.g., error message)
+                 estPrice.innerHTML = "<h2>Calculation Error. Please check input values.</h2>";
+            }
+            console.log("Price estimation successful.", status);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // This runs if the network call or server returns a 4xx/5xx error
+            console.error("Price estimation network failure:", textStatus, errorThrown, jqXHR.responseText);
+            
+            var errorDetail = "Server did not respond correctly.";
+            try {
+                // Try to parse the response text to find a more useful server error message
+                var responseJson = JSON.parse(jqXHR.responseText);
+                errorDetail = responseJson.error || errorDetail;
+            } catch (e) {
+                // If parsing fails, use the generic error detail
+                if (jqXHR.status === 415) {
+                    errorDetail = "Error 415: Server rejected the data format. The client fix should resolve this.";
+                }
+            }
+            estPrice.innerHTML = "<h2>Error: " + errorDetail + "</h2>";
         }
-        console.log("Price estimation successful.", status);
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        // This runs if the network call or server returns a 4xx/5xx error
-        console.error("Price estimation network failure:", textStatus, errorThrown, jqXHR.responseText);
-        // Show the detailed error from the server if available
-        var errorDetail = jqXHR.responseJSON ? jqXHR.responseJSON.error : "Server did not respond correctly.";
-        estPrice.innerHTML = "<h2>Error: " + errorDetail + "</h2>";
     });
 }
 
-
-// --- FIXED FUNCTIONS ---
 
 /**
  * FIXED: Finds the value of the currently checked BHK radio button.
